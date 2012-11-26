@@ -25,8 +25,10 @@ type Result struct{}
 func OpenDatabase(path string) (*Database, error) {
 	db := &Database{path: path, colls: make(map[string]*Collection)}
 	for _, p := range []string{path, path+"/colls"} {
-		if err := os.Mkdir(p, 0755); err != nil {
-			return nil, err
+		if _, err := os.Stat(p); err != nil {
+			if err := os.Mkdir(p, 0755); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return db, nil
@@ -38,8 +40,7 @@ func (db *Database) Close() error {
 }
 
 func (db *Database) Remove() error {
-	// TODO: remove db.path
-	return nil
+	return os.RemoveAll(db.path)
 }
 
 func (db *Database) Coll(name string) *Collection {
