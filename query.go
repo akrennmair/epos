@@ -5,6 +5,8 @@ import (
 	"strconv"
 )
 
+// Query takes a query in the form of a (possibly nested) Condition, and returns
+// a Result object.
 func (c *Collection) Query(q Condition) (*Result, error) {
 	fields := getFields(q)
 
@@ -20,6 +22,14 @@ func (c *Collection) Query(q Condition) (*Result, error) {
 	return newResult(c, ids), nil
 }
 
+// QueryId returns a Result object that will exactly deliver
+// the object with the requested ID.
+func (c *Collection) QueryId(id Id) (*Result, error) {
+	return c.Query(&id)
+}
+
+// QueryAll returns a Result object that will deliver
+// all objects in the object store in no particular order.
 func (c *Collection) QueryAll() (*Result, error) {
 	ids := []Id{}
 	for id_str := range c.store.Keys() {
