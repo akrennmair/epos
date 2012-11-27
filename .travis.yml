@@ -2,5 +2,4 @@ language: go
 install:
     - go get github.com/peterbourgon/diskv
 after_script:
-    - go test -v
     - go test -bench='.*'
