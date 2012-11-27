@@ -109,6 +109,8 @@ func (c *Collection) getNextId() Id {
 	return Id(next_id)
 }
 
+// Insert inserts an object into the collection. It returns the object's
+// ID and, if the insert fails, a non-nil error describing the problem.
 func (c *Collection) Insert(value interface{}) (Id, error) {
 	jsondata, err := json.Marshal(value)
 	if err != nil {
@@ -130,6 +132,8 @@ func (c *Collection) Insert(value interface{}) (Id, error) {
 	return id, nil
 }
 
+// Update replaces an existing object with a new object. If an error
+// occurs during that operation, it returns a non-nil error.
 func (c *Collection) Update(id Id, value interface{}) error {
 	jsondata, err := json.Marshal(value)
 	if err != nil {
@@ -168,6 +172,11 @@ func (c *Collection) addToIndexes(id Id, jsondata []byte) error {
 	return nil
 }
 
+// AddIndex creates an index for a field. Existing records will be indexed, and 
+// future insert and update operations will index that field, as well. If an 
+// index for that field already exists, the AddIndex() is a no-op.
+//
+// A field describes a top-level element of a struct or a particular key of a map.
 func (c *Collection) AddIndex(field string) error {
 	filepath := c.indexpath + "/" + field
 
@@ -220,6 +229,8 @@ func (c *Collection) AddIndex(field string) error {
 	return nil
 }
 
+// RemoveIndex removes an existing index for a field. It returns a non-nil error if
+// an error occurs.
 func (c *Collection) RemoveIndex(field string) error {
 	if idx, exists := c.indexes[field]; exists {
 		idx.file.Close()
@@ -231,6 +242,7 @@ func (c *Collection) RemoveIndex(field string) error {
 	return nil
 }
 
+// Reindex deletes and recreates the index for a field.
 func (c *Collection) Reindex(field string) error {
 	if err := c.RemoveIndex(field); err != nil {
 		return err
@@ -262,6 +274,7 @@ func (c *Collection) removeFromIndexes(id Id) {
 	}
 }
 
+// Delete deletes an object, identified by its ID, from the collection.
 func (c *Collection) Delete(id Id) error {
 	c.removeFromIndexes(id)
 	return c.store.Erase(fmt.Sprintf("%d", id))
@@ -275,6 +288,8 @@ func (c *Collection) QueryAll() (*Result, error) {
 	return c.Query(&True{})
 }
 
+// Vacuum expunges old entries that refer to deleted objects from all indexes 
+// of a collection.
 func (c *Collection) Vacuum() error {
 	for field, _ := range c.indexes {
 		oldf, err := os.Open(c.indexpath + "/" + field)
