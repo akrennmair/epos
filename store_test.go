@@ -13,7 +13,7 @@ func TestStore(t *testing.T) {
 
 	id, err := db.Coll("foo").Insert([]string{"hello", "world!"})
 	if err != nil {
-		t.Error("couldn't insert string slice: %v", err)
+		t.Errorf("couldn't insert string slice: %v", err)
 	}
 	if id != 1 {
 		t.Errorf("string slice id = %d (expected 1)", id)
