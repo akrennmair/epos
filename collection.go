@@ -121,4 +121,5 @@ func (c *Collection) QueryAll() (*Result, error) {
 
 func (c *Collection) Vacuum() error {
 	// TODO: clean up indexes
+	return nil
 }

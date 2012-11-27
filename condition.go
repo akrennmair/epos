@@ -46,3 +46,7 @@ type False struct{}
 func (c *False) Matches(data map[string]interface{}) bool {
 	return false
 }
+
+func (c *Id) Matches(data map[string]interface{}) bool {
+	return data["_id"] == *c
+}
