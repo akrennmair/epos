@@ -17,14 +17,15 @@ type Database struct {
 type Id int64
 
 type Collection struct {
-	store *diskv.Diskv
+	store     *diskv.Diskv
+	indexpath string
 }
 
 type Result struct{}
 
 func OpenDatabase(path string) (*Database, error) {
 	db := &Database{path: path, colls: make(map[string]*Collection)}
-	for _, p := range []string{path, path+"/colls"} {
+	for _, p := range []string{path, path + "/colls", path + "/indexes"} {
 		if _, err := os.Stat(p); err != nil {
 			if err := os.Mkdir(p, 0755); err != nil {
 				return nil, err
@@ -72,16 +73,24 @@ func transformFunc(s string) []string {
 func (db *Database) openColl(name string) *Collection {
 	// create/open collection
 	coll := &Collection{store: diskv.New(diskv.Options{
-		BasePath:  db.path + "/colls/" + name,
-		Transform: transformFunc,
+		BasePath:     db.path + "/colls/" + name,
+		Transform:    transformFunc,
 		CacheSizeMax: 0, // no cache
-	})}
+	}), indexpath: db.path + "/indexes/" + name}
+
+	os.Mkdir(coll.indexpath, 0755)
+
+	coll.loadIndexes()
 
 	// if _next_id is unset, then set it to 1.
 	if _, err := coll.store.Read("_next_id"); err != nil {
 		coll.setNextId(Id(1))
 	}
 	return coll
+}
+
+func (c *Collection) loadIndexes() {
+	// TODO: implement
 }
 
 func (c *Collection) setNextId(next_id Id) {
@@ -107,7 +116,7 @@ func (c *Collection) Insert(value interface{}) (Id, error) {
 	err = c.store.Write(fmt.Sprintf("%d", id), jsondata)
 	if err != nil {
 		c.setNextId(id) // roll back generated ID
-		id = Id(0)     // set id to invalid value
+		id = Id(0)      // set id to invalid value
 	}
 	return id, err
 }

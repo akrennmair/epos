@@ -35,13 +35,13 @@ func (c *Equals) Matches(data map[string]interface{}) bool {
 	return data[c.Field] == c.Value // TODO: do type checks etc.
 }
 
-type True struct { }
+type True struct{}
 
 func (c *True) Matches(data map[string]interface{}) bool {
 	return true
 }
 
-type False struct { }
+type False struct{}
 
 func (c *False) Matches(data map[string]interface{}) bool {
 	return false

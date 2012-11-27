@@ -56,15 +56,15 @@ func TestEquals(t *testing.T) {
 }
 
 func TestComplexQueries(t *testing.T) {
-	if !(&And{ &Equals{"foo", "1"}, &Equals{"bar", "2"}}).Matches(data) {
+	if !(&And{&Equals{"foo", "1"}, &Equals{"bar", "2"}}).Matches(data) {
 		t.Error("foo = 1 AND bar = 2 failed")
 	}
 
-	if !(&Or{ &Equals{"foo", "2"}, &Equals{"quux", 42}}).Matches(data) {
+	if !(&Or{&Equals{"foo", "2"}, &Equals{"quux", 42}}).Matches(data) {
 		t.Error("foo = 2 OR quux = 42 failed")
 	}
 
-	if (&Or{ &Equals{"foo", "2"}, &Equals{"quux", 23}}).Matches(data) {
+	if (&Or{&Equals{"foo", "2"}, &Equals{"quux", 23}}).Matches(data) {
 		t.Error("foo = 2 OR quux = 23 went ok even though it should have failed")
 	}
 }

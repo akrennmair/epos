@@ -18,7 +18,7 @@ func TestStore(t *testing.T) {
 		t.Logf("string slice id = %d", id)
 	}
 
-	id, err = db.Coll("foo").Insert(struct { X, Y string } { X: "pan-galactic", Y: "gargle-blaster" })
+	id, err = db.Coll("foo").Insert(struct{ X, Y string }{X: "pan-galactic", Y: "gargle-blaster"})
 	if err != nil {
 		t.Errorf("couldn't insert struct: %v", err)
 	} else {
@@ -31,16 +31,16 @@ func TestStore(t *testing.T) {
 }
 
 var benchmarkData = struct {
-		Name string
-		Age uint
-		SSN string
-		LuckyNumbers []int
-	} {
-		Name: "John J. McWhackadoodle",
-		Age: 29,
-		SSN: "078-05-1120",
-		LuckyNumbers: []int{23, 43},
-	}
+	Name         string
+	Age          uint
+	SSN          string
+	LuckyNumbers []int
+}{
+	Name:         "John J. McWhackadoodle",
+	Age:          29,
+	SSN:          "078-05-1120",
+	LuckyNumbers: []int{23, 43},
+}
 
 func BenchmarkInsert(b *testing.B) {
 	b.StopTimer()
@@ -49,7 +49,7 @@ func BenchmarkInsert(b *testing.B) {
 
 	b.StartTimer()
 
-	for i := 0 ; i < b.N ; i++ {
+	for i := 0; i < b.N; i++ {
 		_, err := db.Coll("bench").Insert(benchmarkData)
 		if err != nil {
 			b.Fatal("insert failed: ", err)
@@ -73,7 +73,7 @@ func BenchmarkUpdate(b *testing.B) {
 
 	b.StartTimer()
 
-	for i := 0; i < b.N ; i++ {
+	for i := 0; i < b.N; i++ {
 		benchmarkData.LuckyNumbers[0], benchmarkData.LuckyNumbers[1] = benchmarkData.LuckyNumbers[1], benchmarkData.LuckyNumbers[0]
 		if err = db.Coll("bench").Update(id, data); err != nil {
 			b.Fatal("update failed: ", err)
@@ -92,7 +92,7 @@ func BenchmarkDelete(b *testing.B) {
 
 	b.StartTimer()
 
-	for i := 0 ; i < b.N ; i++ {
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		id, err := db.Coll("bench").Insert(benchmarkData)
 		if err != nil {
