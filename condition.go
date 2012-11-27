@@ -25,7 +25,6 @@ func (c *And) match(indexes map[string]*index) []Id {
 	return setToSlice(idSet)
 }
 
-
 func (c *And) getFields() []string {
 	fields := []string{}
 	for _, cond := range *c {

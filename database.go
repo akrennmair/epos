@@ -57,4 +57,3 @@ func (db *Database) Vacuum() error {
 	}
 	return nil
 }
-

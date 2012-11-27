@@ -179,7 +179,7 @@ func (c *Collection) addToIndexes(id Id, jsondata []byte) error {
 func (c *Collection) AddIndex(field string) error {
 	filepath := c.indexpath + "/" + field
 
-	file, err := os.OpenFile(filepath, os.O_WRONLY | os.O_CREATE | os.O_EXCL, 0644)
+	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		// if we couldn't open the file because it already exists, then AddIndex is a no-op.
 		if os.IsExist(err) {
@@ -289,7 +289,7 @@ func (c *Collection) Vacuum() error {
 		}
 		defer oldf.Close()
 
-		newf, err := os.OpenFile(c.indexpath + "/." + field + ".tmp", os.O_WRONLY | os.O_CREATE, 0644)
+		newf, err := os.OpenFile(c.indexpath+"/."+field+".tmp", os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return err
 		}
@@ -320,7 +320,7 @@ func (c *Collection) Vacuum() error {
 			}
 		}
 
-		os.Rename(c.indexpath + "/." + field + ".tmp", c.indexpath + "/" + field)
+		os.Rename(c.indexpath+"/."+field+".tmp", c.indexpath+"/"+field)
 		newf.Sync()
 	}
 	return nil

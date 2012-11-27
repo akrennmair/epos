@@ -1,15 +1,15 @@
 package epos
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"github.com/peterbourgon/diskv"
 	"log"
 )
 
-type Result struct{
-	ids []Id
-	i   int
+type Result struct {
+	ids   []Id
+	i     int
 	store *diskv.Diskv
 }
 

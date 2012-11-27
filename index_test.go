@@ -74,14 +74,14 @@ type entry struct {
 
 var testdata = []struct {
 	Entry entry
-	NewX string
-	NewY int
-	NewZ float64
-	Id Id
+	NewX  string
+	NewY  int
+	NewZ  float64
+	Id    Id
 }{
-	{ Entry: entry{ X: "John Doe", Y: 23, Z: 1.85, }, NewX: "Max Mustermann", NewY: 42, NewZ: 1.83, Id: Id(0), },
-	{ Entry: entry{ X: "Jan Maier", Y: 17, Z: 1.75 }, NewX: "Franz Huber", NewY: 19, NewZ: 1.97, Id: Id(0) },
-	{ Entry: entry{ X: "Franz Haber", Y: 19, Z: 1.90 }, NewX: "Franz Haber-Oettinger", NewY: 19, NewZ: 1.90, Id: Id(0) },
+	{Entry: entry{X: "John Doe", Y: 23, Z: 1.85}, NewX: "Max Mustermann", NewY: 42, NewZ: 1.83, Id: Id(0)},
+	{Entry: entry{X: "Jan Maier", Y: 17, Z: 1.75}, NewX: "Franz Huber", NewY: 19, NewZ: 1.97, Id: Id(0)},
+	{Entry: entry{X: "Franz Haber", Y: 19, Z: 1.90}, NewX: "Franz Haber-Oettinger", NewY: 19, NewZ: 1.90, Id: Id(0)},
 }
 
 func TestIndexInsertUpdateDelete(t *testing.T) {
@@ -132,14 +132,14 @@ func TestIndexInsertUpdateDelete(t *testing.T) {
 		t.Logf("index: %#v", coll.indexes["Y"].data)
 	}
 	if len(coll.indexes["Y"].data["19"]) != 2 {
-		t.Errorf("Index doesn't contain 2 IDs for data 19, %d instead.",  len(coll.indexes["Y"].data["19"]))
+		t.Errorf("Index doesn't contain 2 IDs for data 19, %d instead.", len(coll.indexes["Y"].data["19"]))
 		t.Logf("index: %#v", coll.indexes["Y"].data["19"])
 	}
 
 	for i, e := range testdata {
 		found := false
 		for k, v := range coll.indexes["X"].data {
-			if k == e.Entry.X && len(v)==1 && v[0].id == int64(e.Id) {
+			if k == e.Entry.X && len(v) == 1 && v[0].id == int64(e.Id) {
 				found = true
 				break
 			}

@@ -7,16 +7,16 @@ import (
 )
 
 type index struct {
-	file *os.File
+	file  *os.File
 	field string
-	data map[string][]indexEntry
+	data  map[string][]indexEntry
 }
 
 type indexEntry struct {
 	deleted bool
-	value string
-	id int64
-	fpos int64
+	value   string
+	id      int64
+	fpos    int64
 }
 
 func newIndex(file *os.File, field string) *index {
@@ -50,7 +50,7 @@ func (e *indexEntry) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	value := make([]byte, int(value_len))
-	for i := 0; i<int(value_len); i++ {
+	for i := 0; i < int(value_len); i++ {
 		var b byte
 		if err = binary.Read(r, binary.BigEndian, &b); err != nil {
 			return 0, err
@@ -73,7 +73,7 @@ func (e *indexEntry) WriteTo(w io.Writer) (n int64, err error) {
 	if e.deleted {
 		deleted = 1
 	}
-		
+
 	if err = binary.Write(w, binary.BigEndian, deleted); err != nil {
 		return 0, err
 	}
