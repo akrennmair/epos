@@ -77,7 +77,7 @@ func BenchmarkUpdate(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		benchmarkData.LuckyNumbers[0], benchmarkData.LuckyNumbers[1] = benchmarkData.LuckyNumbers[1], benchmarkData.LuckyNumbers[0]
-		if err = db.Coll("bench").Update(id, data); err != nil {
+		if err = db.Coll("bench").Update(id, benchmarkData); err != nil {
 			b.Fatal("update failed: ", err)
 		}
 	}

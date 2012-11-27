@@ -3,7 +3,6 @@ package epos
 import (
 	"encoding/binary"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/peterbourgon/diskv"
 	"io"
@@ -278,14 +277,6 @@ func (c *Collection) removeFromIndexes(id Id) {
 func (c *Collection) Delete(id Id) error {
 	c.removeFromIndexes(id)
 	return c.store.Erase(fmt.Sprintf("%d", id))
-}
-
-func (c *Collection) Query(q Condition) (*Result, error) {
-	return nil, errors.New("query failed")
-}
-
-func (c *Collection) QueryAll() (*Result, error) {
-	return c.Query(&True{})
 }
 
 // Vacuum expunges old entries that refer to deleted objects from all indexes 
