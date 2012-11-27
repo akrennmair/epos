@@ -193,7 +193,7 @@ func (c *Collection) AddIndex(field string) error {
 	for id_str := range c.store.Keys() {
 		id, err := strconv.ParseInt(id_str, 10, 64)
 		if err != nil {
-			log.Printf("AddIndex: skipping key %s", id_str)
+			//log.Printf("AddIndex: skipping key %s", id_str)
 			continue
 		}
 
