@@ -42,7 +42,7 @@ func (db *Database) openColl(name string) *Collection {
 		BasePath:     db.path + "/colls/" + name,
 		Transform:    transformFunc,
 		CacheSizeMax: 0, // no cache
-	}), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index}
+	}), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
 
 	os.Mkdir(coll.indexpath, 0755)
 
