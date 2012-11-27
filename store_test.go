@@ -14,15 +14,17 @@ func TestStore(t *testing.T) {
 	id, err := db.Coll("foo").Insert([]string{"hello", "world!"})
 	if err != nil {
 		t.Error("couldn't insert string slice: %v", err)
-	} else {
-		t.Logf("string slice id = %d", id)
+	}
+	if id != 1 {
+		t.Errorf("string slice id = %d (expected 1)", id)
 	}
 
 	id, err = db.Coll("foo").Insert(struct{ X, Y string }{X: "pan-galactic", Y: "gargle-blaster"})
 	if err != nil {
 		t.Errorf("couldn't insert struct: %v", err)
-	} else {
-		t.Logf("struct id = %d", id)
+	}
+	if id != 2 {
+		t.Errorf("struct id = %d (expected 2)", id)
 	}
 
 	if err = db.Remove(); err != nil {
