@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/peterbourgon/diskv"
+	"io"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 type Collection struct {
@@ -52,7 +55,41 @@ func (db *Database) openColl(name string) *Collection {
 }
 
 func (c *Collection) loadIndexes() {
-	// TODO: implement
+	filepath.Walk(c.indexpath, func(path string, info os.FileInfo, err error) error {
+		if (info.Mode() & os.ModeType) == 0 {
+			if err := c.loadIndex(path, filepath.Base(path)); err != nil {
+				log.Printf("loadIndex %s failed: %v", path, err)
+				// TODO: should we maybe remove or rebuild index?
+			}
+		}
+		return nil
+	})
+}
+
+func (c *Collection) loadIndex(filepath, field string) error {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return err
+	}
+
+	idx := newIndex(file, field)
+
+	for {
+		fpos, _ := file.Seek(0, os.SEEK_CUR)
+		var entry indexEntry
+		_, err = entry.ReadFrom(file)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		if !entry.Deleted() {
+			entry.fpos = fpos
+			idx.Add(entry)
+		}
+	}
+	return nil
 }
 
 func (c *Collection) setNextId(next_id Id) {
