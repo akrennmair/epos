@@ -15,6 +15,7 @@ import (
 type Collection struct {
 	store     *diskv.Diskv
 	indexpath string
+	indexes   map[string]*index
 }
 
 type Id int64
@@ -41,7 +42,7 @@ func (db *Database) openColl(name string) *Collection {
 		BasePath:     db.path + "/colls/" + name,
 		Transform:    transformFunc,
 		CacheSizeMax: 0, // no cache
-	}), indexpath: db.path + "/indexes/" + name}
+	}), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index}
 
 	os.Mkdir(coll.indexpath, 0755)
 
@@ -89,6 +90,8 @@ func (c *Collection) loadIndex(filepath, field string) error {
 			idx.Add(entry)
 		}
 	}
+
+	c.indexes[field] = idx
 	return nil
 }
 
@@ -134,7 +137,11 @@ func (c *Collection) AddIndex(field string) error {
 }
 
 func (c *Collection) RemoveIndex(field string) error {
-	return errors.New("removing index failed")
+	delete(c.indexes, field)
+	if err := os.Remove(c.indexpath + "/" + field); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Collection) Reindex(field string) error {
