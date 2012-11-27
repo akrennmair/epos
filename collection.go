@@ -118,3 +118,7 @@ func (c *Collection) Query(q Condition) (*Result, error) {
 func (c *Collection) QueryAll() (*Result, error) {
 	return c.Query(&True{})
 }
+
+func (c *Collection) Vacuum() error {
+	// TODO: clean up indexes
+}

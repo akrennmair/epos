@@ -40,3 +40,12 @@ func (db *Database) Coll(name string) *Collection {
 	return coll
 }
 
+func (db *Database) Vacuum() error {
+	for _, coll := range db.colls {
+		if err := coll.Vacuum(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
