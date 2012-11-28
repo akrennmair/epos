@@ -6,7 +6,6 @@ import (
 	"github.com/akrennmair/epos"
 	"github.com/voxelbrain/goptions"
 	"io"
-	"log"
 	"os"
 )
 
@@ -109,11 +108,27 @@ func main() {
 				}
 			}
 		case "update":
-			// TODO: implement
-			log.Printf("read JSON document from stdin and update specified ID.")
+			decoder := json.NewDecoder(os.Stdin)
+			var data interface{}
+			err := decoder.Decode(&data)
+			if err != nil {
+				 fmt.Fprintf(os.Stderr, "Error while decoding JSON document: %v\n", err)
+				 return
+			}
+			coll := db.Coll(options.Update.Collection)
+			if err := coll.Update(epos.Id(options.Update.Id), data); err != nil {
+				fmt.Fprintf(os.Stderr, "Error while updating item %d: %v\n", options.Update.Id, err)
+				return
+			}
+			fmt.Printf("Item %d updated successfully.\n", options.Update.Id)
 		case "delete":
-			// TODO: implement
+			coll := db.Coll(options.Delete.Collection)
+			if err := coll.Delete(epos.Id(options.Delete.Id)); err != nil {
+				fmt.Fprintf(os.Stderr, "Error while deleeting item %d: %v\n", options.Delete.Id, err)
+				return
+			}
+			fmt.Printf("Item %d deleted.\n", options.Delete.Id)
 		default:
-			fmt.Fprintf(os.Stderr, "unknown operation %s", options.Verbs)
+			fmt.Fprintf(os.Stderr, "Error: unknown operation %s\n", options.Verbs)
 	}
 }
