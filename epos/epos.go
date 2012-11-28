@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/akrennmair/epos"
-	"github.com/surma/goptions"
+	"github.com/voxelbrain/goptions"
 	"io"
 	"log"
 	"os"
@@ -16,6 +16,7 @@ func main() {
 		goptions.Help   `goptions:"-h, --help, description='Show this help'"`
 
 		goptions.Verbs
+		Collections struct { } `goptions:"collections"`
 		Dump struct {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to dump'"`
 		} `goptions:"dump"`
@@ -35,7 +36,11 @@ func main() {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
 			Field      string `goptions:"-f, --field, obligatory, description='Field to create index on'"`
 		} `goptions:"addindex"`
-		// TODO: add index, remove index, queries...
+		RemoveIndex struct {
+			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
+			Field      string `goptions:"-f, --field, obligatory, description='Field to remove index from'"`
+		} `goptions:"rmindex"`
+		// TODO: queries
 	}{ }
 
 	goptions.ParseAndFail(&options)
@@ -89,6 +94,19 @@ func main() {
 			coll := db.Coll(options.AddIndex.Collection)
 			if err := coll.AddIndex(options.AddIndex.Field); err != nil {
 				fmt.Fprintf(os.Stderr, "Error while adding index: %v\n", err)
+			}
+		case "rmindex":
+			coll := db.Coll(options.RemoveIndex.Collection)
+			if err := coll.RemoveIndex(options.RemoveIndex.Field); err != nil {
+				fmt.Fprintf(os.Stderr, "Error while removing index: %v\n", err)
+			}
+		case "collections":
+			if colls, err := db.Collections(); err != nil {
+				fmt.Fprintf(os.Stderr, "Error while fetching collections: %v\n", err)
+			} else {
+				for _, collname := range colls {
+					fmt.Printf("%s\n", collname)
+				}
 			}
 		case "update":
 			// TODO: implement

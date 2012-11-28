@@ -48,6 +48,32 @@ func (db *Database) Coll(name string) *Collection {
 	return coll
 }
 
+// Collections returns a list of collection names that are currently in
+// the database.
+func (db *Database) Collections() ([]string, error) {
+	dir, err := os.Open(db.path + "/colls")
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+
+	colls := []string{}
+
+	fi, err := dir.Readdir(0)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, e := range fi {
+		if e.IsDir() {
+			colls = append(colls, e.Name())
+		}
+	}
+
+	return colls, nil
+}
+
 // Vacuum calls Vacuum on all open collections.
 func (db *Database) Vacuum() error {
 	for _, coll := range db.colls {
