@@ -1,5 +1,6 @@
 language: go
 install:
     - go get github.com/peterbourgon/diskv
+    - go get github.com/surma/goptions
 after_script:
     - go test -bench='.*'
