@@ -1,6 +1,6 @@
 language: go
 install:
     - go get github.com/peterbourgon/diskv
-    - go get github.com/surma/goptions
+    - go get github.com/voxelbrain/goptions
 after_script:
     - go test -bench='.*'
