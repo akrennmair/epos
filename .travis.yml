@@ -2,5 +2,6 @@ language: go
 install:
     - go get github.com/peterbourgon/diskv
     - go get github.com/voxelbrain/goptions
+    - go get github.com/feyeleanor/atomiser
 after_script:
     - go test -bench='.*'

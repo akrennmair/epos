@@ -35,7 +35,7 @@ func TestQueries(t *testing.T) {
 	for i, book := range queryData {
 		_, err := books.Insert(book)
 		if err != nil {
-			t.Error("%d. Insert failed: %v", i, err)
+			t.Errorf("%d. Insert failed: %v", i, err)
 		}
 	}
 
