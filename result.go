@@ -3,14 +3,15 @@ package epos
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/peterbourgon/diskv"
+	levigo "github.com/jmhodges/levigo_leveldb_1.4"
 	"log"
 )
 
 type Result struct {
 	ids   []Id
 	i     int
-	store *diskv.Diskv
+	store *levigo.DB
+	ro    *levigo.ReadOptions
 }
 
 func (r *Result) Next(id *Id, result interface{}) bool {
@@ -22,7 +23,7 @@ func (r *Result) Next(id *Id, result interface{}) bool {
 		*id = r.ids[r.i]
 	}
 
-	jsondata, err := r.store.Read(fmt.Sprintf("%d", r.ids[r.i]))
+	jsondata, err := r.store.Get(r.ro, []byte(fmt.Sprintf("%d", r.ids[r.i])))
 	if err != nil {
 		log.Printf("result.Next: retrieving %d failed: %v", r.ids[r.i], err)
 		return false
@@ -38,5 +39,5 @@ func (r *Result) Next(id *Id, result interface{}) bool {
 }
 
 func newResult(c *Collection, ids []Id) *Result {
-	return &Result{store: c.store, ids: ids, i: 0}
+	return &Result{store: c.store, ro: c.ro, ids: ids, i: 0}
 }

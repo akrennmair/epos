@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/peterbourgon/diskv"
+	levigo "github.com/jmhodges/levigo_leveldb_1.4"
 	"io"
 	"log"
 	"os"
@@ -13,9 +13,11 @@ import (
 )
 
 type Collection struct {
-	store     *diskv.Diskv
+	store     *levigo.DB
 	indexpath string
 	indexes   map[string]*index
+	ro        *levigo.ReadOptions
+	wo        *levigo.WriteOptions
 }
 
 type Id int64
@@ -38,18 +40,28 @@ func transformFunc(s string) []string {
 
 func (db *Database) openColl(name string) *Collection {
 	// create/open collection
-	coll := &Collection{store: diskv.New(diskv.Options{
-		BasePath:     db.path + "/colls/" + name,
-		Transform:    transformFunc,
-		CacheSizeMax: 0, // no cache
-	}), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
+	opts := levigo.NewOptions()
+	opts.SetCreateIfMissing(true)
+	store, err := levigo.Open(db.path+"/colls/"+name, opts)
+	if err != nil {
+		panic(err) // TODO: improve this.
+	}
+	coll := &Collection{
+		store:     store,
+		indexpath: db.path + "/indexes/" + name,
+		indexes:   make(map[string]*index),
+		ro:        levigo.NewReadOptions(),
+		wo:        levigo.NewWriteOptions(),
+	}
+
+	coll.ro.SetFillCache(false)
 
 	os.Mkdir(coll.indexpath, 0755)
 
 	coll.loadIndexes()
 
 	// if _next_id is unset, then set it to 1.
-	if _, err := coll.store.Read("_next_id"); err != nil {
+	if data, err := coll.store.Get(coll.ro, []byte("_next_id")); err != nil || len(data)==0 {
 		coll.setNextId(Id(1))
 	}
 	return coll
@@ -98,11 +110,11 @@ func (c *Collection) loadIndex(filepath, field string) error {
 func (c *Collection) setNextId(next_id Id) {
 	next_id_buf := make([]byte, binary.MaxVarintLen64)
 	length := binary.PutVarint(next_id_buf, int64(next_id))
-	c.store.Write("_next_id", next_id_buf[:length])
+	c.store.Put(c.wo, []byte("_next_id"), next_id_buf[:length])
 }
 
 func (c *Collection) getNextId() Id {
-	data, _ := c.store.Read("_next_id")
+	data, _ := c.store.Get(c.ro, []byte("_next_id"))
 	next_id, _ := binary.Varint(data)
 	c.setNextId(Id(next_id + 1))
 	return Id(next_id)
@@ -118,14 +130,14 @@ func (c *Collection) Insert(value interface{}) (Id, error) {
 
 	id := c.getNextId()
 	id_str := fmt.Sprintf("%d", id)
-	err = c.store.Write(id_str, jsondata)
+	err = c.store.Put(c.wo, []byte(id_str), jsondata)
 	if err != nil {
 		c.setNextId(id) // roll back generated ID
 		return Id(0), err
 	}
 
 	if err = c.addToIndexes(id, jsondata); err != nil {
-		c.store.Erase(id_str)
+		c.store.Delete(c.wo, []byte(id_str))
 		return Id(0), err
 	}
 	return id, nil
@@ -139,7 +151,7 @@ func (c *Collection) Update(id Id, value interface{}) error {
 		return err
 	}
 
-	if err = c.store.Write(fmt.Sprintf("%d", id), jsondata); err != nil {
+	if err = c.store.Put(c.wo, []byte(fmt.Sprintf("%d", id)), jsondata); err != nil {
 		return err
 	}
 
@@ -190,7 +202,11 @@ func (c *Collection) AddIndex(field string) error {
 
 	idx := newIndex(file, field)
 
-	for id_str := range c.store.Keys() {
+	it := c.store.NewIterator(c.ro)
+	defer it.Close()
+
+	for it.SeekToFirst(); it.Valid(); it.Next() {
+		id_str := string(it.Key())
 		id, err := strconv.ParseInt(id_str, 10, 64)
 		if err != nil {
 			//log.Printf("AddIndex: skipping key %s", id_str)
@@ -198,7 +214,7 @@ func (c *Collection) AddIndex(field string) error {
 		}
 
 		var entry map[string]interface{}
-		data, err := c.store.Read(id_str)
+		data, err := c.store.Get(c.ro, []byte(id_str))
 		if err != nil {
 			log.Printf("AddIndex: skipping key %s because read from store failed: %v", id_str, err)
 			continue
@@ -276,7 +292,7 @@ func (c *Collection) removeFromIndexes(id Id) {
 // Delete deletes an object, identified by its ID, from the collection.
 func (c *Collection) Delete(id Id) error {
 	c.removeFromIndexes(id)
-	return c.store.Erase(fmt.Sprintf("%d", id))
+	return c.store.Delete(c.wo, []byte(fmt.Sprintf("%d", id)))
 }
 
 // Vacuum expunges old entries that refer to deleted objects from all indexes 

@@ -32,7 +32,10 @@ func (c *Collection) QueryId(id Id) (*Result, error) {
 // all objects in the object store in no particular order.
 func (c *Collection) QueryAll() (*Result, error) {
 	ids := []Id{}
-	for id_str := range c.store.Keys() {
+	it := c.store.NewIterator(c.ro)
+	defer it.Close()
+	for it.SeekToFirst(); it.Valid(); it.Next() {
+		id_str := string(it.Key())
 		id, err := strconv.ParseInt(id_str, 10, 64)
 		if err == nil {
 			ids = append(ids, Id(id))
