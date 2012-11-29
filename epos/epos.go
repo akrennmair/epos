@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"github.com/akrennmair/epos"
 	"github.com/voxelbrain/goptions"
-	"io"
 	"os"
+	"runtime/pprof"
 )
 
 func main() {
+
+
 	options := struct {
 		Database string `goptions:"-d, --database, obligatory, description='Database to work on'"`
+		CPUProfile string `goptions:"--cpuprofile, description='Record CPU profile for use with pprof.'"`
 		goptions.Help   `goptions:"-h, --help, description='Show this help'"`
 
 		goptions.Verbs
@@ -44,6 +47,12 @@ func main() {
 
 	goptions.ParseAndFail(&options)
 
+	if options.CPUProfile != "" {
+		f, _ := os.Create(options.CPUProfile)
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	db, err := epos.OpenDatabase(options.Database)
 	if err != nil {
 		panic(err)
@@ -70,10 +79,7 @@ func main() {
 				var data interface{}
 				err := decoder.Decode(&data)
 				if err != nil {
-					if err != io.EOF {
-						fmt.Fprintf(os.Stderr, "Error while decoding JSON document: %v\n", err)
-						break
-					}
+					break
 				}
 				coll := db.Coll(options.Insert.Collection)
 				id, err := coll.Insert(data)
