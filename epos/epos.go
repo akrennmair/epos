@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/akrennmair/epos"
@@ -42,7 +43,10 @@ func main() {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
 			Field      string `goptions:"-f, --field, obligatory, description='Field to remove index from'"`
 		} `goptions:"rmindex"`
-		// TODO: queries
+		Query struct {
+			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
+			Expression goptions.Remainder `goptions:"description='query expression'"`
+		} `goptions:"query"`
 	}{ }
 
 	goptions.ParseAndFail(&options)
@@ -60,19 +64,27 @@ func main() {
 	defer db.Close()
 
 	switch options.Verbs {
+		case "query":
+			if len(options.Query.Expression) == 0 {
+				fmt.Fprintf(os.Stderr, "Error: missing query expression")
+				break
+			}
+			coll := db.Coll(options.Query.Collection)
+			cond, err := epos.Expression([]string(options.Query.Expression)[0])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Invalid query expression: %v\n", err)
+				break
+			}
+			result, err := coll.Query(cond)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Query failed: %v\n", err)
+				break
+			}
+			dumpData(result)
 		case "dump":
 			coll := db.Coll(options.Dump.Collection)
 			result, _ := coll.QueryAll()
-			var id epos.Id
-			var data interface{}
-			for result.Next(&id, &data) {
-				jsondata, err := json.Marshal(data)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-					continue
-				}
-				fmt.Printf("ID %d:\n%s\n\n", id, string(jsondata))
-			}
+			dumpData(result)
 		case "insert":
 			decoder := json.NewDecoder(os.Stdin)
 			for {
@@ -136,5 +148,25 @@ func main() {
 			fmt.Printf("Item %d deleted.\n", options.Delete.Id)
 		default:
 			fmt.Fprintf(os.Stderr, "Error: unknown operation %s\n", options.Verbs)
+	}
+}
+
+func dumpData(result *epos.Result) {
+	var id epos.Id
+	var data interface{}
+	for result.Next(&id, &data) {
+		jsondata, err := json.Marshal(data)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			continue
+		}
+
+		buf := bytes.NewBuffer([]byte{})
+		if err = json.Indent(buf, jsondata, "", "    "); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			continue
+		}
+
+		fmt.Printf("ID %d:\n%s\n\n", id, buf.String())
 	}
 }
