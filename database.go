@@ -16,9 +16,9 @@ const (
 )
 
 type Database struct {
-	path  string
-	colls map[string]*Collection
-	storageFactory func (db *Database, name string) StorageBackend
+	path           string
+	colls          map[string]*Collection
+	storageFactory func(db *Database, name string) StorageBackend
 }
 
 // OpenDatabase opens and if necessary creates a database identified by the
@@ -54,12 +54,12 @@ func OpenDatabase(path string, typ StorageType) (*Database, error) {
 	case STORAGE_AUTO, STORAGE_LEVELDB:
 		db.storageFactory = NewLevelDBStorageBackend
 		if write_storage {
-			ioutil.WriteFile(db.path + "/engine", []byte("leveldb"), 0644)
+			ioutil.WriteFile(db.path+"/engine", []byte("leveldb"), 0644)
 		}
 	case STORAGE_DISKV:
 		db.storageFactory = NewDiskvStorageBackend
 		if write_storage {
-			ioutil.WriteFile(db.path + "/engine", []byte("diskv"), 0644)
+			ioutil.WriteFile(db.path+"/engine", []byte("diskv"), 0644)
 		}
 	default:
 		return nil, errors.New("invalid storage type")

@@ -28,7 +28,7 @@ func (db *Database) openColl(name string) *Collection {
 	coll.loadIndexes()
 
 	// if _next_id is unset, then set it to 1.
-	if data, err := coll.store.Read("_next_id"); err != nil || len(data)==0 {
+	if data, err := coll.store.Read("_next_id"); err != nil || len(data) == 0 {
 		coll.setNextId(Id(1))
 	}
 	return coll

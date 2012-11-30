@@ -6,8 +6,8 @@ import (
 
 type LevelDBStorageBackend struct {
 	store *levigo.DB
-	ro *levigo.ReadOptions
-	wo *levigo.WriteOptions
+	ro    *levigo.ReadOptions
+	wo    *levigo.WriteOptions
 }
 
 func NewLevelDBStorageBackend(db *Database, name string) StorageBackend {
@@ -19,7 +19,7 @@ func NewLevelDBStorageBackend(db *Database, name string) StorageBackend {
 		wo: levigo.NewWriteOptions(),
 	}
 
-	store, err := levigo.Open(db.path + "/colls/" + name, opts)
+	store, err := levigo.Open(db.path+"/colls/"+name, opts)
 	if err != nil {
 		panic(err) // TODO: improve this
 	}

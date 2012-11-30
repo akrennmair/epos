@@ -19,7 +19,6 @@ func Expression(s string) (Condition, error) {
 	return parseExpressionToCondition(expr)
 }
 
-
 func parseExpressionToCondition(expr *chain.Cell) (Condition, error) {
 	sym, ok := expr.Head.(atomiser.Symbol)
 	if !ok {
@@ -28,7 +27,7 @@ func parseExpressionToCondition(expr *chain.Cell) (Condition, error) {
 
 	sym = atomiser.Symbol(strings.ToLower(string(sym)))
 
-	switch (sym) {
+	switch sym {
 	case "and":
 		return parseAnd(expr.Tail)
 	case "or":
@@ -100,7 +99,7 @@ func parseEqual(expr *chain.Cell) (Condition, error) {
 
 	expr = expr.Tail
 	if expr == nil {
-		return  nil, fmt.Errorf("missing value in (eq %s) expression", cond.Field)
+		return nil, fmt.Errorf("missing value in (eq %s) expression", cond.Field)
 	}
 
 	cond.Value = fmt.Sprintf("%v", expr.Head)
