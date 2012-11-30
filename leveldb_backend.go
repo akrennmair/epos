@@ -1,7 +1,7 @@
 package epos
 
 import (
-	levigo "github.com/jmhodges/levigo"
+	levigo "github.com/jmhodges/levigo_leveldb_1.4"
 )
 
 type LevelDBStorageBackend struct {
