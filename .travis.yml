@@ -1,4 +1,6 @@
 language: go
+before_script:
+    - sudo apt-get install libleveldb-dev
 install:
     - go get github.com/peterbourgon/diskv
     - go get github.com/jmhodges/levigo_leveldb_1.4
