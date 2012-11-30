@@ -20,22 +20,22 @@ func Expression(s string) (Condition, error) {
 }
 
 func parseExpressionToCondition(expr *chain.Cell) (Condition, error) {
-	sym, ok := expr.Head.(atomiser.Symbol)
+	sym, ok := expr.Car().(atomiser.Symbol)
 	if !ok {
-		return nil, fmt.Errorf("expected symbol, got '%v' instead", expr.Head)
+		return nil, fmt.Errorf("expected symbol, got '%v' instead", expr.Car())
 	}
 
 	sym = atomiser.Symbol(strings.ToLower(string(sym)))
 
 	switch sym {
 	case "and":
-		return parseAnd(expr.Tail)
+		return parseAnd(expr.Cdr())
 	case "or":
-		return parseOr(expr.Tail)
+		return parseOr(expr.Cdr())
 	case "eq":
-		return parseEqual(expr.Tail)
+		return parseEqual(expr.Cdr())
 	case "id":
-		return parseId(expr.Tail)
+		return parseId(expr.Cdr())
 	}
 	return nil, fmt.Errorf("unknown symbol '%s'", sym)
 }
@@ -45,14 +45,14 @@ func parseAnd(expr *chain.Cell) (Condition, error) {
 
 	cur := expr
 	for cur != nil {
-		if subexpr, ok := cur.Head.(*chain.Cell); ok {
+		if subexpr, ok := cur.Car().(*chain.Cell); ok {
 			if subcond, err := parseExpressionToCondition(subexpr); err != nil {
 				return nil, err
 			} else {
 				*cond = append(*cond, subcond)
 			}
 		}
-		cur = cur.Tail
+		cur = cur.Cdr()
 	}
 
 	if len(*cond) == 0 {
@@ -67,14 +67,14 @@ func parseOr(expr *chain.Cell) (Condition, error) {
 
 	cur := expr
 	for cur != nil {
-		if subexpr, ok := cur.Head.(*chain.Cell); ok {
+		if subexpr, ok := cur.Car().(*chain.Cell); ok {
 			if subcond, err := parseExpressionToCondition(subexpr); err != nil {
 				return nil, err
 			} else {
 				*cond = append(*cond, subcond)
 			}
 		}
-		cur = cur.Tail
+		cur = cur.Cdr()
 	}
 
 	if len(*cond) == 0 {
@@ -91,18 +91,18 @@ func parseEqual(expr *chain.Cell) (Condition, error) {
 		return nil, errors.New("missing arguments in eq")
 	}
 
-	if field, ok := expr.Head.(atomiser.Symbol); !ok {
-		return nil, fmt.Errorf("expected field name, got '%#v' instead", expr.Head)
+	if field, ok := expr.Car().(atomiser.Symbol); !ok {
+		return nil, fmt.Errorf("expected field name, got '%#v' instead", expr.Car())
 	} else {
 		cond.Field = string(field)
 	}
 
-	expr = expr.Tail
+	expr = expr.Cdr()
 	if expr == nil {
 		return nil, fmt.Errorf("missing value in (eq %s) expression", cond.Field)
 	}
 
-	cond.Value = fmt.Sprintf("%v", expr.Head)
+	cond.Value = fmt.Sprintf("%v", expr.Car())
 
 	return cond, nil
 }
@@ -114,8 +114,8 @@ func parseId(expr *chain.Cell) (Condition, error) {
 
 	id := new(Id)
 
-	if id_str, ok := expr.Head.(atomiser.Symbol); !ok {
-		return nil, fmt.Errorf("expected ID, got '%#v' instead", expr.Head)
+	if id_str, ok := expr.Car().(atomiser.Symbol); !ok {
+		return nil, fmt.Errorf("expected ID, got '%#v' instead", expr.Car())
 	} else {
 		parsed_id, err := strconv.ParseInt(string(id_str), 10, 64)
 		if err != nil {
