@@ -1,6 +1,7 @@
 language: go
 before_install:
     - sudo add-apt-repository -y ppa:ceph-ubuntu/dev
+    - sudo apt-get update
     - sudo apt-get install libleveldb-dev
 install:
     - go get github.com/peterbourgon/diskv
