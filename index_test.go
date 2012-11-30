@@ -7,7 +7,7 @@ import (
 )
 
 func TestIndexSimple(t *testing.T) {
-	db, err := OpenDatabase("testdb_index")
+	db, err := OpenDatabase("testdb_index", STORAGE_AUTO)
 	if err != nil {
 		t.Fatalf("couldn't open testdb_index: %v", err)
 	}
@@ -85,7 +85,7 @@ var testdata = []struct {
 }
 
 func TestIndexInsertUpdateDelete(t *testing.T) {
-	db, err := OpenDatabase("testdb_index_iud")
+	db, err := OpenDatabase("testdb_index_iud", STORAGE_AUTO)
 	if err != nil {
 		t.Fatalf("couldn't open testdb_index_iud: %v", err)
 	}

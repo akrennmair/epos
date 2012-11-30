@@ -19,6 +19,9 @@ func main() {
 		goptions.Help   `goptions:"-h, --help, description='Show this help'"`
 
 		goptions.Verbs
+		Create struct {
+			Type string `goptions:"-t, --type, description='Create database with the specified storage type (diskv, leveldb)'"`
+		} `goptions:"create"`
 		Collections struct { } `goptions:"collections"`
 		Dump struct {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to dump'"`
@@ -57,7 +60,25 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	db, err := epos.OpenDatabase(options.Database)
+	if options.Verbs == "create" {
+		typ := epos.STORAGE_AUTO
+		switch options.Create.Type {
+		case "leveldb":
+			typ = epos.STORAGE_LEVELDB
+		case "diskv":
+			typ = epos.STORAGE_DISKV
+		default:
+			fmt.Fprintf(os.Stderr, "Error: invalid storage type %s.\n", options.Create.Type)
+		}
+		db, err := epos.OpenDatabase(options.Database, typ)
+		if err != nil {
+			panic(err)
+		}
+		db.Close()
+		return
+	}
+
+	db, err := epos.OpenDatabase(options.Database, epos.STORAGE_AUTO)
 	if err != nil {
 		panic(err)
 	}

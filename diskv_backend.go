@@ -32,7 +32,7 @@ func transformFunc(s string) []string {
 	return []string{data[2:4], data[0:2]}
 }
 
-func NewDiskvStorageBackend(db *Database, name string) *DiskvStorageBackend {
+func NewDiskvStorageBackend(db *Database, name string) StorageBackend {
 	diskv := &DiskvStorageBackend{
 		store: diskv.New(diskv.Options{
 			BasePath:     db.path + "/colls/" + name,

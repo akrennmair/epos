@@ -21,14 +21,14 @@ type Id int64
 
 func (db *Database) openColl(name string) *Collection {
 	// create/open collection
-	coll := &Collection{store: NewDiskvStorageBackend(db, name), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
+	coll := &Collection{store: db.storageFactory(db, name), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
 
 	os.Mkdir(coll.indexpath, 0755)
 
 	coll.loadIndexes()
 
 	// if _next_id is unset, then set it to 1.
-	if _, err := coll.store.Read("_next_id"); err != nil {
+	if data, err := coll.store.Read("_next_id"); err != nil || len(data)==0 {
 		coll.setNextId(Id(1))
 	}
 	return coll

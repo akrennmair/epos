@@ -5,7 +5,7 @@ import (
 )
 
 func TestStore(t *testing.T) {
-	db, err := OpenDatabase("testdb1")
+	db, err := OpenDatabase("testdb1", STORAGE_AUTO)
 	if err != nil {
 		t.Fatalf("couldn't open testdb1: %v", err)
 	}
@@ -47,7 +47,7 @@ var benchmarkData = struct {
 func BenchmarkInsert(b *testing.B) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_insert")
+	db, _ := OpenDatabase("testdb_bench_insert", STORAGE_AUTO)
 
 	b.StartTimer()
 
@@ -66,7 +66,7 @@ func BenchmarkInsert(b *testing.B) {
 func BenchmarkUpdate(b *testing.B) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_update")
+	db, _ := OpenDatabase("testdb_bench_update", STORAGE_AUTO)
 
 	id, err := db.Coll("bench").Insert(benchmarkData)
 	if err != nil {
@@ -90,7 +90,7 @@ func BenchmarkUpdate(b *testing.B) {
 func BenchmarkDelete(b *testing.B) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_delete")
+	db, _ := OpenDatabase("testdb_bench_delete", STORAGE_AUTO)
 
 	b.StartTimer()
 

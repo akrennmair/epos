@@ -22,7 +22,7 @@ var queryData = []book{
 }
 
 func TestQueries(t *testing.T) {
-	db, err := OpenDatabase("testdb_queries")
+	db, err := OpenDatabase("testdb_queries", STORAGE_AUTO)
 	if err != nil {
 		t.Fatalf("couldn't open testdb_queries: %v", err)
 	}
