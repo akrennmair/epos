@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+// Expression converts a S-Expr-based query to a structure of Condition objects.
+// The following symbols are available for queries:
+//
+//    (id 1)					query entry with ID 1
+//    (eq field-name value)		query all entries where field-name equals value
+//    (or expr...)              OR all query sub-expressions
+//    (and expr...)             AND all query sub-expressions
 func Expression(s string) (Condition, error) {
 	expr := atomiser.NewAtomiser(strings.NewReader(s)).ReadList()
 
