@@ -1,5 +1,5 @@
 language: go
-before_script:
+before_install:
     - sudo apt-get install libleveldb-dev
 install:
     - go get github.com/peterbourgon/diskv
