@@ -3,14 +3,13 @@ package epos
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/peterbourgon/diskv"
 	"log"
 )
 
 type Result struct {
 	ids   []Id
 	i     int
-	store *diskv.Diskv
+	store StorageBackend
 }
 
 func (r *Result) Next(id *Id, result interface{}) bool {

@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/peterbourgon/diskv"
 	"io"
 	"log"
 	"os"
@@ -13,36 +12,16 @@ import (
 )
 
 type Collection struct {
-	store     *diskv.Diskv
+	store     StorageBackend
 	indexpath string
 	indexes   map[string]*index
 }
 
 type Id int64
 
-func transformFunc(s string) []string {
-	// special case for internal data
-	if s == "_next_id" {
-		return []string{}
-	}
-
-	data := ""
-	if len(s) < 4 {
-		data = fmt.Sprintf("%04s", s)
-	} else {
-		data = s[len(s)-4:]
-	}
-
-	return []string{data[2:4], data[0:2]}
-}
-
 func (db *Database) openColl(name string) *Collection {
 	// create/open collection
-	coll := &Collection{store: diskv.New(diskv.Options{
-		BasePath:     db.path + "/colls/" + name,
-		Transform:    transformFunc,
-		CacheSizeMax: 0, // no cache
-	}), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
+	coll := &Collection{store: NewDiskvStorageBackend(db, name), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
 
 	os.Mkdir(coll.indexpath, 0755)
 
