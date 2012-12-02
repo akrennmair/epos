@@ -1,6 +1,7 @@
 package epos
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -44,10 +45,18 @@ var benchmarkData = struct {
 	LuckyNumbers: []int{23, 43},
 }
 
-func BenchmarkInsert(b *testing.B) {
+func BenchmarkInsertDiskv(b *testing.B) {
+	benchmarkInsert(b, STORAGE_DISKV)
+}
+
+func BenchmarkInsertLevelDB(b *testing.B) {
+	benchmarkInsert(b, STORAGE_LEVELDB)
+}
+
+func benchmarkInsert(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_insert", STORAGE_AUTO)
+	db, _ := OpenDatabase(fmt.Sprintf("testdb_bench_insert_%d", typ), typ)
 
 	b.StartTimer()
 
@@ -63,10 +72,18 @@ func BenchmarkInsert(b *testing.B) {
 	db.Remove()
 }
 
-func BenchmarkUpdate(b *testing.B) {
+func BenchmarkUpdateDiskv(b *testing.B) {
+	benchmarkUpdate(b, STORAGE_DISKV)
+}
+
+func BenchmarkUpdateLevelDB(b *testing.B) {
+	benchmarkUpdate(b, STORAGE_LEVELDB)
+}
+
+func benchmarkUpdate(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_update", STORAGE_AUTO)
+	db, _ := OpenDatabase(fmt.Sprintf("testdb_bench_update_%d", typ), typ)
 
 	id, err := db.Coll("bench").Insert(benchmarkData)
 	if err != nil {
@@ -87,10 +104,18 @@ func BenchmarkUpdate(b *testing.B) {
 	db.Remove()
 }
 
-func BenchmarkDelete(b *testing.B) {
+func BenchmarkDeleteDiskv(b *testing.B) {
+	benchmarkDelete(b, STORAGE_DISKV)
+}
+
+func BenchmarkDeleteLevelDB(b *testing.B) {
+	benchmarkDelete(b, STORAGE_LEVELDB)
+}
+
+func benchmarkDelete(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase("testdb_bench_delete", STORAGE_AUTO)
+	db, _ := OpenDatabase(fmt.Sprintf("testdb_bench_delete_%d", typ), typ)
 
 	b.StartTimer()
 
@@ -109,5 +134,4 @@ func BenchmarkDelete(b *testing.B) {
 	b.StopTimer()
 	db.Close()
 	db.Remove()
-
 }
