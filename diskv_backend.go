@@ -5,13 +5,6 @@ import (
 	"github.com/peterbourgon/diskv"
 )
 
-type StorageBackend interface {
-	Read(key string) ([]byte, error)
-	Write(key string, value []byte) error
-	Erase(key string) error
-	Keys() <-chan string
-}
-
 type DiskvStorageBackend struct {
 	store *diskv.Diskv
 }
@@ -32,10 +25,10 @@ func transformFunc(s string) []string {
 	return []string{data[2:4], data[0:2]}
 }
 
-func NewDiskvStorageBackend(db *Database, name string) StorageBackend {
+func NewDiskvStorageBackend(path string) StorageBackend {
 	diskv := &DiskvStorageBackend{
 		store: diskv.New(diskv.Options{
-			BasePath:     db.path + "/colls/" + name,
+			BasePath:     path,
 			Transform:    transformFunc,
 			CacheSizeMax: 0, // no cache
 		}),

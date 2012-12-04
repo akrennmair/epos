@@ -10,7 +10,7 @@ type LevelDBStorageBackend struct {
 	wo    *levigo.WriteOptions
 }
 
-func NewLevelDBStorageBackend(db *Database, name string) StorageBackend {
+func NewLevelDBStorageBackend(path string) StorageBackend {
 	opts := levigo.NewOptions()
 	opts.SetCreateIfMissing(true)
 
@@ -19,7 +19,7 @@ func NewLevelDBStorageBackend(db *Database, name string) StorageBackend {
 		wo: levigo.NewWriteOptions(),
 	}
 
-	store, err := levigo.Open(db.path+"/colls/"+name, opts)
+	store, err := levigo.Open(path, opts)
 	if err != nil {
 		panic(err) // TODO: improve this
 	}

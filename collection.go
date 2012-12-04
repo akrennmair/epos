@@ -21,7 +21,7 @@ type Id int64
 
 func (db *Database) openColl(name string) *Collection {
 	// create/open collection
-	coll := &Collection{store: db.storageFactory(db, name), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
+	coll := &Collection{store: db.storageFactory(db.path + "/colls/" + name), indexpath: db.path + "/indexes/" + name, indexes: make(map[string]*index)}
 
 	os.Mkdir(coll.indexpath, 0755)
 

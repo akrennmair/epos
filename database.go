@@ -1,24 +1,15 @@
 package epos
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 )
 
-type StorageType int
-
-const (
-	STORAGE_AUTO StorageType = iota
-	STORAGE_DISKV
-	STORAGE_LEVELDB
-)
-
 type Database struct {
 	path           string
 	colls          map[string]*Collection
-	storageFactory func(db *Database, name string) StorageBackend
+	storageFactory func(path string) StorageBackend
 }
 
 // OpenDatabase opens and if necessary creates a database identified by the
@@ -35,34 +26,25 @@ func OpenDatabase(path string, typ StorageType) (*Database, error) {
 		}
 	}
 
+	if typ == STORAGE_AUTO {
+		typ = STORAGE_LEVELDB
+	}
+
 	write_storage := false
 	storage_type, err := ioutil.ReadFile(db.path + "/engine")
 	if err == nil {
-		switch string(storage_type) {
-		case "leveldb":
-			typ = STORAGE_LEVELDB
-		case "diskv":
-			typ = STORAGE_DISKV
-		default:
-			return nil, fmt.Errorf("invalid storage type %s", string(storage_type))
-		}
+		db.storageFactory = storageBackends[StorageType(storage_type)]
 	} else {
+		db.storageFactory = storageBackends[typ]
 		write_storage = true
 	}
 
-	switch typ {
-	case STORAGE_AUTO, STORAGE_LEVELDB:
-		db.storageFactory = NewLevelDBStorageBackend
-		if write_storage {
-			ioutil.WriteFile(db.path+"/engine", []byte("leveldb"), 0644)
-		}
-	case STORAGE_DISKV:
-		db.storageFactory = NewDiskvStorageBackend
-		if write_storage {
-			ioutil.WriteFile(db.path+"/engine", []byte("diskv"), 0644)
-		}
-	default:
-		return nil, errors.New("invalid storage type")
+	if db.storageFactory == nil {
+		return nil, fmt.Errorf("invalid storage type %s", string(storage_type))
+	}
+
+	if write_storage {
+		ioutil.WriteFile(db.path+"/engine", []byte(typ), 0644)
 	}
 
 	return db, nil
