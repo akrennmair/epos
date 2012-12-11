@@ -1,3 +1,5 @@
+// see file LICENSE for license information.
+
 // epos is a embeddable persistent object store, written in Go.
 // It is meant to store, retrieve, query and delete Go objects to a local
 // file store. In this respect, it is NoSQL database, but it only
