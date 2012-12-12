@@ -13,7 +13,7 @@ file store. In this respect, it is NoSQL database, but it only
 works on local files and is embeddable into existing Go programs,
 so it can be thought of as the SQLite of NoSQL databases.
 
-And this is how you do things:
+Here is a very basic overview how to use epos:
 
 	// open/create database:
 	db, err := epos.OpenDatabase("foo.db", epos.STORAGE_AUTO) // also available: STORAGE_DISKV, STORAGE_LEVELDB
@@ -28,7 +28,6 @@ And this is how you do things:
 	for result.Next(&id, &data) {
 		// handle data
 	}
-
 
 ## License
 
