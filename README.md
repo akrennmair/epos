@@ -24,7 +24,7 @@ Here is a very basic overview how to use epos:
 	// index fields:
 	err = db.Coll("users").AddIndex("login")
 	// query items:
-	result, err = db.Coll("users").Query("(eq username foobar)")
+	result, err = db.Coll("users").Query(epos.Expression("(eq username foobar)"))
 	for result.Next(&id, &data) {
 		// handle data
 	}
