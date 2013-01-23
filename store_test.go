@@ -112,11 +112,9 @@ func benchmarkUpdate(b *testing.B, typ StorageType) {
 	db.Remove()
 }
 
-/*
 func BenchmarkDeleteDiskv(b *testing.B) {
 	benchmarkDelete(b, STORAGE_DISKV)
 }
-*/
 
 func BenchmarkDeleteLevelDB(b *testing.B) {
 	benchmarkDelete(b, STORAGE_LEVELDB)
