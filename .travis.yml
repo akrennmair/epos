@@ -9,5 +9,6 @@ install:
     - go get github.com/voxelbrain/goptions
     - go get github.com/feyeleanor/atomiser
     - go get github.com/syndtr/goleveldb/leveldb
+    - go get code.google.com/p/snappy-go/snappy
 after_script:
     - go test -bench='.*'

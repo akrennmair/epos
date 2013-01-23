@@ -12,6 +12,15 @@ type Result struct {
 	store StorageBackend
 }
 
+func (r *Result) Count() int {
+	return len(r.ids)
+}
+
+func (r *Result) First(id *Id, result interface{}) bool {
+	r.i = 0
+	return r.Next(id, result)
+}
+
 func (r *Result) Next(id *Id, result interface{}) bool {
 	if r.i >= len(r.ids) {
 		return false

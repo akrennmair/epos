@@ -31,11 +31,11 @@ func main() {
 		} `goptions:"insert"`
 		Update struct {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
-			Id         int64  `goptions:"-i, --id, obligatory, description='ID of entry to update'"`
+			Id         int    `goptions:"-i, --id, obligatory, description='ID of entry to update'"`
 		} `goptions:"update"`
 		Delete struct {
 			Collection string `goptions:"-c, --collection, obligatory, description='Collection to work on'"`
-			Id         int64  `goptions:"-i, --id, obligatory, description='ID of entry to delete'"`
+			Id         int    `goptions:"-i, --id, obligatory, description='ID of entry to delete'"`
 		} `goptions:"delete"`
 		Vacuum struct { } `goptions:"vacuum"`
 		AddIndex struct {
