@@ -7,9 +7,10 @@ import (
 type StorageType string
 
 const (
-	STORAGE_AUTO    StorageType = "auto"
-	STORAGE_DISKV   StorageType = "diskv"
-	STORAGE_LEVELDB StorageType = "leveldb"
+	STORAGE_AUTO      StorageType = "auto"
+	STORAGE_DISKV     StorageType = "diskv"
+	STORAGE_LEVELDB   StorageType = "leveldb"
+	STORAGE_GOLEVELDB StorageType = "goleveldb"
 )
 
 type StorageBackend interface {
@@ -25,6 +26,7 @@ func init() {
 	storageBackends = make(map[StorageType]func(string) StorageBackend)
 	RegisterStorageBackend(string(STORAGE_LEVELDB), NewLevelDBStorageBackend)
 	RegisterStorageBackend(string(STORAGE_DISKV), NewDiskvStorageBackend)
+	RegisterStorageBackend(string(STORAGE_GOLEVELDB), NewGoLevelDBStorageBackend)
 }
 
 // RegisterStorageBackend registers a new custom storage backend under a new 

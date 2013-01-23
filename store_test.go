@@ -53,6 +53,10 @@ func BenchmarkInsertLevelDB(b *testing.B) {
 	benchmarkInsert(b, STORAGE_LEVELDB)
 }
 
+func BenchmarkInsertGoLevelDB(b *testing.B) {
+	benchmarkInsert(b, STORAGE_GOLEVELDB)
+}
+
 func benchmarkInsert(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
@@ -80,6 +84,10 @@ func BenchmarkUpdateLevelDB(b *testing.B) {
 	benchmarkUpdate(b, STORAGE_LEVELDB)
 }
 
+func BenchmarkUpdateGoLevelDB(b *testing.B) {
+	benchmarkUpdate(b, STORAGE_GOLEVELDB)
+}
+
 func benchmarkUpdate(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
@@ -104,18 +112,24 @@ func benchmarkUpdate(b *testing.B, typ StorageType) {
 	db.Remove()
 }
 
+/*
 func BenchmarkDeleteDiskv(b *testing.B) {
 	benchmarkDelete(b, STORAGE_DISKV)
 }
+*/
 
 func BenchmarkDeleteLevelDB(b *testing.B) {
 	benchmarkDelete(b, STORAGE_LEVELDB)
 }
 
+func BenchmarkDeleteGoLevelDB(b *testing.B) {
+	benchmarkDelete(b, STORAGE_GOLEVELDB)
+}
+
 func benchmarkDelete(b *testing.B, typ StorageType) {
 	b.StopTimer()
 
-	db, _ := OpenDatabase(fmt.Sprintf("testdb_bench_delete_%d", typ), typ)
+	db, _ := OpenDatabase(fmt.Sprintf("testdb_bench_delete_%s", typ), typ)
 
 	b.StartTimer()
 
