@@ -8,5 +8,6 @@ install:
     - go get github.com/jmhodges/levigo_leveldb_1.4
     - go get github.com/voxelbrain/goptions
     - go get github.com/feyeleanor/atomiser
+    - go get github.com/syndtr/goleveldb/leveldb
 after_script:
     - go test -bench='.*'
