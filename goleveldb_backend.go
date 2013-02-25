@@ -1,13 +1,13 @@
 package epos
 
 import (
-	"github.com/syndtr/goleveldb/leveldb/db"
-	"github.com/syndtr/goleveldb/leveldb/desc"
+	"github.com/syndtr/goleveldb/leveldb"
+	desc "github.com/syndtr/goleveldb/leveldb/descriptor"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 )
 
 type GoLevelDBStorageBackend struct {
-	store *db.DB
+	store *leveldb.DB
 	ro    *opt.ReadOptions
 	wo    *opt.WriteOptions
 }
@@ -18,7 +18,7 @@ func NewGoLevelDBStorageBackend(path string) StorageBackend {
 		panic(err)
 	}
 
-	db, err := db.Open(desc, &opt.Options{Flag: opt.OFCreateIfMissing})
+	db, err := leveldb.Open(desc, &opt.Options{Flag: opt.OFCreateIfMissing})
 	if err != nil {
 		panic(err)
 	}
